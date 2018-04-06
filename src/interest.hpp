@@ -24,6 +24,7 @@
 
 #include "delegation-list.hpp"
 #include "name.hpp"
+#include "function.hpp"
 #include "packet-base.hpp"
 #include "selectors.hpp"
 #include "util/time.hpp"
@@ -134,6 +135,9 @@ public: // matching
   bool
   matchesInterest(const Interest& other) const;
 
+  void
+  removeHeadFunction() const;
+
 public: // Name, Nonce, and Guiders
   const Name&
   getName() const
@@ -149,6 +153,25 @@ public: // Name, Nonce, and Guiders
     return *this;
   }
 
+  const Function&
+  getFunction() const
+  {
+    return m_function;
+  }
+
+  void
+  setFunction(const Function& function) const
+  {
+    m_function = function;
+    m_wire.reset();
+    //return *this;
+  }
+
+  bool
+  hasFunction() const
+  {
+    return m_function.toUri() != "/" ? true : false;
+  }
   /** @brief Check if Nonce set
    */
   bool
@@ -330,6 +353,7 @@ public: // Selectors
 
 private:
   Name m_name;
+  mutable Function m_function;
   Selectors m_selectors;
   mutable optional<uint32_t> m_nonce;
   time::milliseconds m_interestLifetime;

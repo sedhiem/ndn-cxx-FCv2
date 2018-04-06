@@ -66,6 +66,9 @@ Interest::wireEncode(EncodingImpl<TAG>& encoder) const
 
   // (reverse encoding)
 
+  //Function
+  totalLength += getFunction().wireEncode(encoder);
+
   // ForwardingHint
   if (m_forwardingHint.size() > 0) {
     totalLength += m_forwardingHint.wireEncode(encoder);
@@ -164,6 +167,9 @@ Interest::wireDecode(const Block& wire)
   else {
     m_forwardingHint = DelegationList();
   }
+
+  //Function
+  m_function.wireDecode(m_wire.get(tlv::Function));
 }
 
 std::string
@@ -293,6 +299,23 @@ Interest::matchesInterest(const Interest& other) const
   /// @todo #3162 match ForwardingHint field
   return (this->getName() == other.getName() &&
           this->getSelectors() == other.getSelectors());
+}
+
+void
+Interest::removeHeadFunction() const
+{
+    std::string str = this->getFunction().toUri();
+    if(this->hasFunction()){
+      auto found = str.find("/", 1);
+      if(found != std::string::npos){ //has multiple function headers
+        str.erase(1, found);
+      }
+      else{
+        str.erase(1, str.length()-1); //only one function header
+      }
+    }
+    this->setFunction(Function(str));
+
 }
 
 // ---- field accessors ----
