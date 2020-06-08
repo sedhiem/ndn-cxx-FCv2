@@ -213,6 +213,13 @@ Data::setContent(const uint8_t* value, size_t valueSize)
   return *this;
 }
 
+void
+Data::setContent2(const uint8_t* value, size_t valueSize) const
+{
+  m_wire.reset();
+  m_content = makeBinaryBlock(tlv::Content, value, valueSize);
+}
+
 Data&
 Data::setContent(const ConstBufferPtr& value)
 {

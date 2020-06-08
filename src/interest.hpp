@@ -192,6 +192,9 @@ public: // Name, Nonce, and Guiders
   Interest&
   setNonce(uint32_t nonce);
 
+  void setNonce2
+  (uint32_t nonce) const;
+
   /** @brief Refresh nonce
    *
    *  It's guaranteed that new nonce value differs from the existing one.
@@ -200,7 +203,7 @@ public: // Name, Nonce, and Guiders
    *  If nonce is not set, this method does nothing.
    */
   void
-  refreshNonce();
+  refreshNonce() const;
 
   time::milliseconds
   getInterestLifetime() const

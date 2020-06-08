@@ -338,7 +338,14 @@ Interest::setNonce(uint32_t nonce)
 }
 
 void
-Interest::refreshNonce()
+Interest::setNonce2(uint32_t nonce) const
+{
+  m_nonce = nonce;
+  m_wire.reset();
+}
+
+void
+Interest::refreshNonce() const
 {
   if (!hasNonce())
     return;
@@ -348,7 +355,7 @@ Interest::refreshNonce()
   while (newNonce == oldNonce)
     newNonce = random::generateWord32();
 
-  setNonce(newNonce);
+  setNonce2(newNonce);
 }
 
 Interest&

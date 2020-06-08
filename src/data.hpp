@@ -169,6 +169,9 @@ public: // Data fields
   Data&
   setContent(const uint8_t* value, size_t valueSize);
 
+  void
+  setContent2(const uint8_t* value, size_t valueSize) const;
+
   /** @brief Set Content from wire buffer
    *  @param value Content value, which does not need to be a TLV element
    *  @return a reference to this Data, to allow chaining
@@ -248,7 +251,7 @@ protected:
 private:
   Name m_name;
   MetaInfo m_metaInfo;
-  Block m_content;
+  mutable Block m_content;
   Signature m_signature;
 
   mutable Block m_wire;
