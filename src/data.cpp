@@ -56,6 +56,9 @@ Data::wireEncode(EncodingImpl<TAG>& encoder, bool wantUnsignedPortionOnly) const
 
   size_t totalLength = 0;
 
+  //Function
+  totalLength += getFunction().wireEncode(encoder);
+
   // SignatureValue
   if (!wantUnsignedPortionOnly) {
     if (!m_signature) {
@@ -142,6 +145,9 @@ Data::wireDecode(const Block& wire)
   if (val != m_wire.elements_end()) {
     m_signature.setValue(*val);
   }
+
+  //Function
+  m_function.wireDecode(m_wire.get(tlv::Function));
 }
 
 const Name&
