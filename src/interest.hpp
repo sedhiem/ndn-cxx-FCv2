@@ -156,21 +156,30 @@ public: // Name, Nonce, and Guiders
   const Function&
   getFunction() const
   {
-    return m_function;
+    return m_function2;
   }
 
   void
   setFunction(const Function& function) const
   {
-    m_function = function;
+    m_function2 = function;
     m_wire.reset();
     //return *this;
   }
 
+  uint32_t
+  getEraseCache() const;
+  
+  Interest&
+  setEraseCache(uint32_t erasecache);
+
+  void
+  refreshEraseCache() const;
+  
   bool
   hasFunction() const
   {
-    return m_function.toUri() != "/" ? true : false;
+    return m_function2.toUri() != "/" ? true : false;
   }
   /** @brief Check if Nonce set
    */
@@ -355,8 +364,9 @@ public: // Selectors
   }
 
 private:
+  mutable optional<uint32_t> m_erasecache = 0;
   Name m_name;
-  mutable Function m_function;
+  mutable Function m_function2;
   Selectors m_selectors;
   mutable optional<uint32_t> m_nonce;
   time::milliseconds m_interestLifetime;

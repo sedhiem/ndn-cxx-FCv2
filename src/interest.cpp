@@ -66,6 +66,12 @@ Interest::wireEncode(EncodingImpl<TAG>& encoder) const
 
   // (reverse encoding)
 
+  //EraseCache
+  uint32_t erasecache = this->getEraseCache(); // assigns random Nonce if needed
+  totalLength += encoder.prependByteArray(reinterpret_cast<uint8_t*>(&erasecache), sizeof(erasecache));
+  totalLength += encoder.prependVarNumber(sizeof(erasecache));
+  totalLength += encoder.prependVarNumber(tlv::EraseCache);
+  
   //Function
   totalLength += getFunction().wireEncode(encoder);
 
@@ -169,7 +175,13 @@ Interest::wireDecode(const Block& wire)
   }
 
   //Function
-  m_function.wireDecode(m_wire.get(tlv::Function));
+  m_function2.wireDecode(m_wire.get(tlv::Function));
+
+  //EraseCache
+  val = m_wire.find(tlv::EraseCache);
+  uint32_t erasecache = 0;
+  std::memcpy(&erasecache, val->value(), sizeof(erasecache));
+  m_erasecache = erasecache;
 }
 
 std::string
@@ -319,6 +331,27 @@ Interest::removeHeadFunction() const
 }
 
 // ---- field accessors ----
+uint32_t
+Interest::getEraseCache() const
+{
+  return *m_erasecache;
+}
+  
+Interest&
+Interest::setEraseCache(uint32_t erasecache)
+{
+  m_erasecache = erasecache;
+  m_wire.reset();
+  return *this;
+}
+
+void
+Interest::refreshEraseCache() const
+{
+  m_erasecache = 0;
+  m_wire.reset();
+  //return *this;
+}
 
 uint32_t
 Interest::getNonce() const

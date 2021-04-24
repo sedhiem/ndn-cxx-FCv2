@@ -182,6 +182,7 @@ Face::expressInterest(const Interest& interest,
 {
   shared_ptr<Interest> interest2 = make_shared<Interest>(interest);
   interest2->getNonce();
+  interest2->getEraseCache();
 
   IO_CAPTURE_WEAK_IMPL(dispatch) {
     impl->asyncExpressInterest(interest2, afterSatisfied, afterNacked, afterTimeout);
