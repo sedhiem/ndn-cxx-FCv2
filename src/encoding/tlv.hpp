@@ -90,6 +90,7 @@ enum {
   LinkPreference  = 30,
   LinkDelegation  = 31,
   Function        = 32,
+  EraseCache      = 33,
 
   NameComponentMin = 1,
   NameComponentMax = 65535,
