@@ -2,18 +2,27 @@
 /*
  * Copyright (c) 2013-2017 Regents of the University of California.
  *
- * This file is part of ndn-cxx library (NDN C++ library with eXperimental eXtensions).
+ * This file is part of ndn-cxx library (NDN C++ library with eXperimental
+ * eXtensions).
  *
- * ndn-cxx library is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
+ * ndn-cxx library is free software: you can redistribute it and/or modify it
+ * under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * ndn-cxx library is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * ndn-cxx library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
  *
- * You should have received copies of the GNU General Public License and GNU Lesser
- * General Public License along with ndn-cxx, e.g., in COPYING.md file.  If not, see
+ * You should have received copies of the GNU General Public License and GNU
+ * Lesser
+ * General Public License along with ndn-cxx, e.g., in COPYING.md file.  If not,
+ * see
  * <http://www.gnu.org/licenses/>.
  *
  * See AUTHORS.md for complete list of ndn-cxx authors and contributors.
@@ -29,11 +38,11 @@
 #include "encoding/encoding-buffer.hpp"
 #include "util/time.hpp"
 
-#include <sstream>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/range/concepts.hpp>
+#include <sstream>
 
 namespace ndn {
 
@@ -44,7 +53,8 @@ BOOST_CONCEPT_ASSERT((WireDecodable<Function>));
 BOOST_CONCEPT_ASSERT((boost::RandomAccessIterator<Function::iterator>));
 BOOST_CONCEPT_ASSERT((boost::RandomAccessIterator<Function::const_iterator>));
 BOOST_CONCEPT_ASSERT((boost::RandomAccessIterator<Function::reverse_iterator>));
-BOOST_CONCEPT_ASSERT((boost::RandomAccessIterator<Function::const_reverse_iterator>));
+BOOST_CONCEPT_ASSERT(
+    (boost::RandomAccessIterator<Function::const_reverse_iterator>));
 BOOST_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<Function>));
 static_assert(std::is_base_of<tlv::Error, Function::Error>::value,
               "Function::Error must inherit from tlv::Error");
@@ -53,24 +63,13 @@ const size_t Function::npos = std::numeric_limits<size_t>::max();
 
 // ---- constructors, encoding, decoding ----
 
-Function::Function()
-  : m_wire(tlv::Function)
-{
-}
+Function::Function() : m_wire(tlv::Function) {}
 
-Function::Function(const Block& wire)
-  : m_wire(wire)
-{
-  m_wire.parse();
-}
+Function::Function(const Block &wire) : m_wire(wire) { m_wire.parse(); }
 
-Function::Function(const char* uri)
-  : Function(std::string(uri))
-{
-}
+Function::Function(const char *uri) : Function(std::string(uri)) {}
 
-Function::Function(std::string uri)
-{
+Function::Function(std::string uri) {
   boost::algorithm::trim(uri);
   if (uri.empty())
     return;
@@ -98,8 +97,7 @@ Function::Function(std::string uri)
         uri.erase(0, iAfterAuthority + 1);
         boost::algorithm::trim(uri);
       }
-    }
-    else {
+    } else {
       uri.erase(0, 1);
       boost::algorithm::trim(uri);
     }
@@ -113,25 +111,22 @@ Function::Function(std::string uri)
     if (iComponentEnd == std::string::npos)
       iComponentEnd = uri.size();
 
-    append(Component::fromEscapedString(&uri[0], iComponentStart, iComponentEnd));
+    append(
+        Component::fromEscapedString(&uri[0], iComponentStart, iComponentEnd));
     iComponentStart = iComponentEnd + 1;
   }
 }
 
-std::string
-Function::toUri() const
-{
+std::string Function::toUri() const {
   std::ostringstream os;
   os << *this;
   return os.str();
 }
 
-template<encoding::Tag TAG>
-size_t
-Function::wireEncode(EncodingImpl<TAG>& encoder) const
-{
+template <encoding::Tag TAG>
+size_t Function::wireEncode(EncodingImpl<TAG> &encoder) const {
   size_t totalLength = 0;
-  for (const Component& comp : *this | boost::adaptors::reversed) {
+  for (const Component &comp : *this | boost::adaptors::reversed) {
     totalLength += comp.wireEncode(encoder);
   }
 
@@ -142,9 +137,7 @@ Function::wireEncode(EncodingImpl<TAG>& encoder) const
 
 NDN_CXX_DEFINE_WIRE_ENCODE_INSTANTIATIONS(Function);
 
-const Block&
-Function::wireEncode() const
-{
+const Block &Function::wireEncode() const {
   if (m_wire.hasWire())
     return m_wire;
 
@@ -160,19 +153,16 @@ Function::wireEncode() const
   return m_wire;
 }
 
-void
-Function::wireDecode(const Block& wire)
-{
+void Function::wireDecode(const Block &wire) {
   if (wire.type() != tlv::Function)
-    BOOST_THROW_EXCEPTION(tlv::Error("Unexpected TLV type when decoding Function"));
+    BOOST_THROW_EXCEPTION(
+        tlv::Error("Unexpected TLV type when decoding Function"));
 
   m_wire = wire;
   m_wire.parse();
 }
 
-Function
-Function::deepCopy() const
-{
+Function Function::deepCopy() const {
   Function copiedFunction(*this);
   copiedFunction.m_wire.resetWire();
   copiedFunction.wireEncode(); // "compress" the underlying buffer
@@ -181,26 +171,25 @@ Function::deepCopy() const
 
 // ---- accessors ----
 
-const name::Component&
-Function::at(ssize_t i) const
-{
+const name::Component &Function::at(ssize_t i) const {
   if (i < 0) {
     i = size() + i;
   }
 
   if (i < 0 || static_cast<size_t>(i) >= size()) {
-    BOOST_THROW_EXCEPTION(Error("Requested component does not exist (out of bounds)"));
+    BOOST_THROW_EXCEPTION(
+        Error("Requested component does not exist (out of bounds)"));
   }
 
-  return reinterpret_cast<const Component&>(m_wire.elements()[i]);
+  return reinterpret_cast<const Component &>(m_wire.elements()[i]);
 }
 
-PartialFunction
-Function::getSubFunction(ssize_t iStartComponent, size_t nComponents) const
-{
+PartialFunction Function::getSubFunction(ssize_t iStartComponent,
+                                         size_t nComponents) const {
   PartialFunction result;
 
-  ssize_t iStart = iStartComponent < 0 ? this->size() + iStartComponent : iStartComponent;
+  ssize_t iStart =
+      iStartComponent < 0 ? this->size() + iStartComponent : iStartComponent;
   size_t iEnd = this->size();
 
   iStart = std::max(iStart, static_cast<ssize_t>(0));
@@ -216,21 +205,16 @@ Function::getSubFunction(ssize_t iStartComponent, size_t nComponents) const
 
 // ---- modifiers ----
 
-Function&
-Function::appendVersion()
-{
-  return appendVersion(time::toUnixTimestamp(time::system_clock::now()).count());
+Function &Function::appendVersion() {
+  return appendVersion(
+      time::toUnixTimestamp(time::system_clock::now()).count());
 }
 
-Function&
-Function::appendTimestamp()
-{
+Function &Function::appendTimestamp() {
   return appendTimestamp(time::system_clock::now());
 }
 
-Function&
-Function::append(const PartialFunction& name)
-{
+Function &Function::append(const PartialFunction &name) {
   if (&name == this)
     // Copying from this name, so need to make a copy first.
     return append(PartialFunction(name));
@@ -243,11 +227,9 @@ Function::append(const PartialFunction& name)
 
 // ---- algorithms ----
 
-Function
-Function::getSuccessor() const
-{
+Function Function::getSuccessor() const {
   if (empty()) {
-    static uint8_t firstValue[] {0};
+    static uint8_t firstValue[]{0};
     Function firstFunction;
     firstFunction.append(firstValue, 1);
     return firstFunction;
@@ -256,9 +238,7 @@ Function::getSuccessor() const
   return getPrefix(-1).append(get(-1).getSuccessor());
 }
 
-bool
-Function::isPrefixOf(const Function& other) const
-{
+bool Function::isPrefixOf(const Function &other) const {
   // This name is longer than the name we are checking against.
   if (size() > other.size())
     return false;
@@ -272,9 +252,7 @@ Function::isPrefixOf(const Function& other) const
   return true;
 }
 
-bool
-Function::equals(const Function& other) const
-{
+bool Function::equals(const Function &other) const {
   if (size() != other.size())
     return false;
 
@@ -286,9 +264,8 @@ Function::equals(const Function& other) const
   return true;
 }
 
-int
-Function::compare(size_t pos1, size_t count1, const Function& other, size_t pos2, size_t count2) const
-{
+int Function::compare(size_t pos1, size_t count1, const Function &other,
+                      size_t pos2, size_t count2) const {
   count1 = std::min(count1, this->size() - pos1);
   count2 = std::min(count2, other.size() - pos2);
   size_t count = std::min(count1, count2);
@@ -299,20 +276,18 @@ Function::compare(size_t pos1, size_t count1, const Function& other, size_t pos2
       return comp;
     }
   }
-  // [pos1, pos1+count) of this Function equals [pos2, pos2+count) of other Function
+  // [pos1, pos1+count) of this Function equals [pos2, pos2+count) of other
+  // Function
   return count1 - count2;
 }
 
 // ---- stream operators ----
 
-std::ostream&
-operator<<(std::ostream& os, const Function& name)
-{
+std::ostream &operator<<(std::ostream &os, const Function &name) {
   if (name.empty()) {
     os << "/";
-  }
-  else {
-    for (const auto& component : name) {
+  } else {
+    for (const auto &component : name) {
       os << "/";
       component.toUri(os);
     }
@@ -320,9 +295,7 @@ operator<<(std::ostream& os, const Function& name)
   return os;
 }
 
-std::istream&
-operator>>(std::istream& is, Function& name)
-{
+std::istream &operator>>(std::istream &is, Function &name) {
   std::string inputString;
   is >> inputString;
   name = Function(inputString);
@@ -334,9 +307,7 @@ operator>>(std::istream& is, Function& name)
 
 namespace std {
 
-size_t
-hash<ndn::Function>::operator()(const ndn::Function& name) const
-{
+size_t hash<ndn::Function>::operator()(const ndn::Function &name) const {
   return boost::hash_range(name.wireEncode().wire(),
                            name.wireEncode().wire() + name.wireEncode().size());
 }
